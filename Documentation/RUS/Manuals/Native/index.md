@@ -1,4 +1,4 @@
-Banshee Framework Documentation (Native)						(https://github.com/fascwind/BansheeEngine/README.md)
+Banshee Framework Documentation (Native)						[Главная](https://github.com/fascwind/BansheeEngine/README.md)
 ===============
 
 [TOC]
