@@ -2,12 +2,12 @@ Manuals									{#manuals}
 ===============
 
 # Quick start
-[Getting started](@ref gettingStarted) - This is a short guide on how to create a fully functional Banshee application, aimed to get you up and running quickly, without going into too much detail.
+[Getting started](gettingStarted.md) - This is a short guide on how to create a fully functional Banshee application, aimed to get you up and running quickly, without going into too much detail.
 
 # User manuals
 A complete set of manuals covering all major functionality provided by Banshee, starting with basics and slowly guiding you through more advanced concepts. This should be the primary entry point for new users.
-- [Startup and main loop](@ref startup)
-- [Scene objects and components](@ref scenesAndComponents)
+- [Startup and main loop](/User/startingUp.md)
+- [Scene objects and components](/User/scenesAndComponents.md)
 - **Resources**
  - [Basics and import](@ref resourceBasicsAndImport)
  - [Saving and loading](@ref resourceSavingAndLoading)
