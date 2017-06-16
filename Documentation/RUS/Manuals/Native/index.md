@@ -1,13 +1,11 @@
-Banshee Framework Documentation (Native)						[Главная](https://github.com/fascwind/BansheeEngine/README.md)
+Документация Banshee Framework (Native) [mainpage]
 ===============
-
-[TOC]
 
 Добро пожаловать в раздел документации Banshee Framework.
 
 Данный раздел состоит из руководств и описаний API для всех native типов.
 
-# Руководства # {#mainpage_a}
+# Руководства # [mainpage_a]
 
 Первый шаг в изучении Banshee должен быть через руководства. Их можно разделить на две категории:
 
