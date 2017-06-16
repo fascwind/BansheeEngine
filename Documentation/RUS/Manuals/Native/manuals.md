@@ -6,7 +6,7 @@ Manuals									{#manuals}
 
 # User manuals
 A complete set of manuals covering all major functionality provided by Banshee, starting with basics and slowly guiding you through more advanced concepts. This should be the primary entry point for new users.
-- [Startup and main loop](/User/startingUp.md)
+- [Startup and main loop](./User/startingUp.md)
 - [Scene objects and components](./User/scenesAndComponents.md)
 - **Resources**
  - [Basics and import](@ref resourceBasicsAndImport)
