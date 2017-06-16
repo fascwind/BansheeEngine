@@ -111,7 +111,7 @@ A set of manuals covering advanced functionality intented for those wanting to e
  - **Exposing code to script API (manually)**
   - [Interacting with the script runtime](mono.md)
   - [Script objects](scriptObjects.md)
-- [Extending the GUI system](customGUI.md)
+- [Extending the GUI system](customGui.md)
 - [Porting to other platforms](porting.md)
 - [Code style](codeStyle.md)
 - [Quick reference](quickref.md)
