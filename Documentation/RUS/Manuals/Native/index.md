@@ -1,4 +1,4 @@
-[Документация Banshee Framework (Native)](nativemain)
+Документация Banshee Framework (Native)
 ===============
 
 Добро пожаловать в раздел документации Banshee Framework.
