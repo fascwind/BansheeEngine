@@ -23,7 +23,7 @@ The scripting system supports C# and comes with an extensive API ensuring you ca
 # Documentation
 * [Managed](http://docs.banshee3d.com/Managed/index.html) - Documentation for the scripting (C#) API. This is what most users will be interested in.
 * [Native](http://docs.banshee3d.com/Native/index.html) - Documentation for the native (C++) API. This is meant for advanced users meaning to extend/modify the engine.
-* [RUS Native](https://github.com/fascwind/BansheeEngine/blob/master/Documentation/RUS/Manuals/Native/index.md) - Документация на русском языке, главная цель данного перевода - изучение самого движка для дальнейшего его применения. Не является эталлоным. Перевод как метка моего изучения Banshee.
+* [RUS Native](https://github.com/fascwind/BansheeEngine/blob/master/Documentation/RUS/Manuals/Native/index.md) - Документация на русском языке, главная цель данного перевода - изучение самого движка для дальнейшего его применения. Не является эталлоным. Перевод как метка моего изучения Banshee. пока не настроены все url. Передвижение внутри данной документации невозможен. Читайте оригинал)
 
 # About
 * [License](https://github.com/BearishSun/BansheeEngine/blob/master/Documentation/GitHub/license.md) - Information about Banshee's license.
