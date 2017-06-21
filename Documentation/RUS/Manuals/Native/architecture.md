@@ -1,8 +1,8 @@
-Architecture									{#architecture}
+Архитектура	
 ===============
-[TOC]
 
 This manual will explain the architecture of Banshee, to give you a better idea of how everything is structured and where to locate particular systems.
+Это руководство объяснит архитектуру Banshee, чтобы вы лучше поняли как оно устроено и где находятся детали системы
 
 Banshee is implemented throughout many separate libraries. Spreading the engine implementation over different libraries ensures multiple things:
  - Portions of the engine can be easily modified or replaced
@@ -10,6 +10,12 @@ Banshee is implemented throughout many separate libraries. Spreading the engine 
  - Internals are easier to understand as libraries form a clear architecture between themselves, while ensuring source code isn't all bulked into one big package
  - It ensures a higher quality design by decoupling code and forcing an order of dependencies
  
+Banshee включает много отдельных библиотек. Механизм распространения на множество разных библиотек обеспечивает множество вещей:
+ - Части движка легко модифицируемы и заменяемые.
+ - Пользователь может выбрать какие ему необходимы части.
+ - Прозрачная архитектура, в форме библиотек, помогает легче понять внутренное строение, при условии что исходный код не окажется одним большим проектом.
+ - Обеспечивает более качествунную структуру разбивая код и усиливая порядок зависимости.
+
 All the libraries can be separated into four main categories:
  - Layers - These are the core libraries of the engine. Each layer is built on top of the previous layer and provides higher level and more specific functionality than the other.
  - Plugins - These are separate, independant, and in most cases optional libraries containing various high level systems. They always depend on a specific layer, depending how high level the system they implement is. You are able to design your own plugins that completely replace certain portion of the engine functionality without having to modify the engine itself (e.g. use OpenGL instead of DirectX)
