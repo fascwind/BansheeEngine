@@ -236,7 +236,7 @@ namespace bs { namespace ct
 		 * Lets the command buffer know that the provided framebuffer resource has been queued on it, and will be used by
 		 * the device when the command buffer is submitted.
 		 */
-		void registerResource(VulkanFramebuffer* res, RenderSurfaceMask loadMask, VulkanUseFlags flags);
+		void registerResource(VulkanFramebuffer* res, RenderSurfaceMask loadMask, UINT32 readMask);
 
 		/** Notifies the command buffer that the provided query has been queued on it. */
 		void registerQuery(VulkanOcclusionQuery* query) { mOcclusionQueries.insert(query); }
@@ -467,7 +467,8 @@ namespace bs { namespace ct
 		UnorderedSet<VulkanOcclusionQuery*> mOcclusionQueries;
 		UnorderedSet<VulkanTimerQuery*> mTimerQueries;
 		Vector<ImageInfo> mImageInfos;
-		Vector<ImageSubresourceInfo> mSubresourceInfos;
+		Vector<ImageSubresourceInfo> mSubresourceInfoStorage;
+		Set<UINT32> mPassTouchedSubresourceInfos; // All subresource infos touched by the current render pass
 		UINT32 mGlobalQueueIdx;
 
 		SPtr<VulkanGraphicsPipelineState> mGraphicsPipeline;
