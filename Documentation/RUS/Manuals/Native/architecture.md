@@ -2,31 +2,25 @@
 ===============
 
 This manual will explain the architecture of Banshee, to give you a better idea of how everything is structured and where to locate particular systems.
-Это руководство объяснит архитектуру Banshee, чтобы вы лучше поняли как оно устроено и где находятся детали системы
-
-Banshee is implemented throughout many separate libraries. Spreading the engine implementation over different libraries ensures multiple things:
- - Portions of the engine can be easily modified or replaced
- - User can choose which portions of the engine he requires
- - Internals are easier to understand as libraries form a clear architecture between themselves, while ensuring source code isn't all bulked into one big package
- - It ensures a higher quality design by decoupling code and forcing an order of dependencies
+Это руководство объяснит архитектуру Banshee, чтобы вы лучше поняли идею всей труктуры и расположения системы.
  
-Banshee включает много отдельных библиотек. Механизм распространения на множество разных библиотек обеспечивает множество вещей:
+Banshee включает много отдельных библиотек. Механизм разделения на множество разных библиотек обеспечивает много возможностей:
  - Части движка легко модифицируемы и заменяемые.
  - Пользователь может выбрать какие ему необходимы части.
- - Прозрачная архитектура, в форме библиотек, помогает легче понять внутренное строение, при условии что исходный код не окажется одним большим проектом.
+ - Прозрачная архитектура, в форме библиотек, помогает легче понять внутренное строение, при условии что исходный код не превратиться в большой громоздкий проект.
  - Обеспечивает более качествунную структуру разбивая код и усиливая порядок зависимости.
-
-All the libraries can be separated into four main categories:
- - Layers - These are the core libraries of the engine. Each layer is built on top of the previous layer and provides higher level and more specific functionality than the other.
- - Plugins - These are separate, independant, and in most cases optional libraries containing various high level systems. They always depend on a specific layer, depending how high level the system they implement is. You are able to design your own plugins that completely replace certain portion of the engine functionality without having to modify the engine itself (e.g. use OpenGL instead of DirectX)
- - Scripting - These are libraries used for interop between the C++ core and a scripting language, as well as the managed scripting libraries themselves. Generally these can also be counted as plugins, but they are a bit more tightly coupled with the engine core.
- - Executable - These are small pieces of code meant to initialize and start up the engine/editor.
  
-To give you a better idea here is a diagram showing how all the libraries connect. You can use this for reference when we talk about the individual library purposes later on.
+ Все библиотеки разделены на 4 основные части
+ - Слои - Базовые библиотеки движка. Каждый слой собран поверх предидущего слоя и обеспечиваает высший уровень функциональности чем другие.
+ - Расширения (Плагины) - Отдельные, независимые и чаще всего дополнительные библиотеки содержащие различные системы высокого уровня. Они всегда взаимосвязаны с определенным слоем, в зависимости от того насколько высокоуровневая система реализована. Вы в состоянии разработать свои плагины которые полностью заменят функциональные части движка, без необходимости изменять сам движок. (в том числе используя OpenGL вместо DirectX)
+ - Сценарии (Скрипты) - Взаимосвязь библиотек с ядром написанном на C++ и языком сценариев так же хорошо настроено как и самостоятельное управление памятью языком сценариев.
+ - Исполняемые - Это небольшие фрагменты кода, предназначенные для инициализации и запуска движка/редактора. 
+ 
+Диаграмма даст дает понять как подключены все библиотеки. Позже когда мы поговорим об отдельных целях библиотеки, вы можете использовать это для справки.
 ![Banshee's libraries](ArchitectureSimple.png)  
 
-> Note that BansheeEditor layer and scripting libraries are only available when compiling the full Banshee runtime, and are not present in bsFramework.
- 
+> Обратите внимание: библиотеки BansheeEditor и библиотеки сценариев доступны только при компиляции полной исполняемой программы Banshee и не присутствуют в bsFramework.
+
 # Layers #										{#arch_layers}
 The layers contain the core of the engine. All the essentials and all the abstract interfaces for plugins belong here. The engine core was split into multiple layers for two reasons:
  - To give developers a chance to pick the level of functionality they need. Some people will want just core and utility and start working on their own engine or low level technologies, while others might be just interested in game development and will stick with the editor layer.
