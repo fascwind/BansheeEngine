@@ -5,7 +5,7 @@ project (Banshee)
 set (BS_VERSION_MAJOR 0)
 set (BS_VERSION_MINOR 4)
 
-set (BS_PREBUILT_DEPENDENCIES_VERSION 2)
+set (BS_PREBUILT_DEPENDENCIES_VERSION 4)
 set (BS_SRC_DEPENDENCIES_VERSION 12)
 
 # Configuration types
@@ -61,15 +61,19 @@ endif()
 
 mark_as_advanced(CMAKE_INSTALL_PREFIX)
 
+include(CMake/Common.cmake)
+
 # Ensure dependencies are up to date
-## Check prebuilt dependencies that user downloads in a .zip
+## Check prebuilt dependencies that are downloaded in a .zip
 set(BUILTIN_DEP_VERSION_FILE ${PROJECT_SOURCE_DIR}/../Dependencies/.version)
 if(NOT EXISTS ${BUILTIN_DEP_VERSION_FILE})
-	message(FATAL_ERROR "Precompiled dependencies package is missing our out of date. Re-run setup or manually download the latest dependencies package.")
+	message(STATUS "Binary dependencies are missing. Downloading package...")
+	update_binary_deps()	
 else()
 	file (STRINGS ${BUILTIN_DEP_VERSION_FILE} CURRENT_BUILTIN_DEP_VERSION)
 	if(${BS_PREBUILT_DEPENDENCIES_VERSION} GREATER ${CURRENT_BUILTIN_DEP_VERSION})
-		message(FATAL_ERROR "Your precomiled dependencies package is out of date. Re-run setup or manually download the latest dependencies package.")
+		message(STATUS "Your precomiled dependencies package is out of date. Downloading latest package...")
+		update_binary_deps()
 	endif()
 endif()
 	
@@ -188,7 +192,6 @@ else()
 	set(BS_LIBRARY_EXTENSION ".a")
 endif()
 
-include(CMake/Common.cmake)
 include(CMake/FindPackageOrBuild.cmake)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS TRUE)

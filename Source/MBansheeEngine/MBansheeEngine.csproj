@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+	<CSFile Include="*.cs"/>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,8 +50,6 @@
     <Compile Include="Animation\AnimationCurves.cs" />
     <Compile Include="Animation\Bone.cs" />
     <Compile Include="Animation\Interop\NativeAnimation.cs" />
-    <Compile Include="Animation\MorphShapes.cs" />
-    <Compile Include="Animation\Skeleton.cs" />
     <Compile Include="Audio\Audio.cs" />
     <Compile Include="Audio\AudioClip.cs" />
     <Compile Include="Audio\AudioListener.cs" />
@@ -59,7 +58,7 @@
     <Compile Include="Audio\Interop\NativeAudioSource.cs" />
     <Compile Include="GUI\GUICanvas.cs" />
     <Compile Include="GUI\GUIScrollBar.cs" />
-    <Compile Include="Rendering\PostProcessSettings.cs" />
+    <Compile Include="Rendering\RenderSettings.cs" />
     <Compile Include="Serialization\ShowInInspector.cs" />
     <Compile Include="Serialization\Step.cs" />
     <Compile Include="Utility\AsyncOp.cs" />
@@ -127,7 +126,6 @@
     <Compile Include="Math\Rect2I.cs" />
     <Compile Include="Math\Vector2I.cs" />
     <Compile Include="Rendering\Mesh.cs" />
-    <Compile Include="Utility\MeshData.cs" />
     <Compile Include="Scene\MissingComponent.cs" />
     <Compile Include="Utility\PathEx.cs" />
     <Compile Include="Physics\BoxCollider.cs" />
@@ -156,8 +154,6 @@
     <Compile Include="Physics\Interop\NativeSphereCollider.cs" />
     <Compile Include="Physics\Interop\NativeSphericalJoint.cs" />
     <Compile Include="Physics\Physics.cs" />
-    <Compile Include="Physics\PhysicsMaterial.cs" />
-    <Compile Include="Physics\PhysicsMesh.cs" />
     <Compile Include="Physics\PhysicsCommon.cs" />
     <Compile Include="Physics\PlaneCollider.cs" />
     <Compile Include="Physics\Rigidbody.cs" />

@@ -562,15 +562,17 @@ namespace bs
 		TID_ImportedAnimationEvents = 1124,
 		TID_CBone = 1125,
 		TID_MaterialParamData = 1126,
-		TID_PostProcessSettings = 1127,
+		TID_RenderSettings = 1127,
 		TID_MorphShape = 1128,
 		TID_MorphShapes = 1129,
 		TID_MorphChannel = 1130,
 		TID_ReflectionProbe = 1131,
 		TID_CReflectionProbe = 1132,
 		TID_CachedTextureData = 1133,
-        TID_Skybox = 1134,
-        TID_CSkybox = 1135,
+		TID_Skybox = 1134,
+		TID_CSkybox = 1135,
+		TID_LightProbeVolume = 1136,
+		TID_SavedLightProbeInfo = 1137,
 
 		// Moved from Engine layer
 		TID_CCamera = 30000,
@@ -579,6 +581,13 @@ namespace bs
 		TID_Renderable = 30004,
 		TID_Light = 30011,
 		TID_CLight = 30012,
+		TID_AutoExposureSettings = 30016,
+		TID_TonemappingSettings = 30017,
+		TID_WhiteBalanceSettings = 30018,
+		TID_ColorGradingSettings = 30019,
+		TID_DepthOfFieldSettings = 30020,
+		TID_AmbientOcclusionSettings = 30021,
+		TID_ScreenSpaceReflectionsSettings = 30022
 	};
 }
 

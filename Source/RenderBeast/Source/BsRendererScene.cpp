@@ -3,7 +3,6 @@
 #include "BsRendererScene.h"
 #include "BsCamera.h"
 #include "BsLight.h"
-#include "BsLightProbeCache.h"
 #include "BsReflectionProbe.h"
 #include "BsMesh.h"
 #include "BsRenderer.h"
@@ -11,13 +10,13 @@
 #include "BsGpuParamsSet.h"
 #include "BsRenderBeastOptions.h"
 #include "BsRenderBeast.h"
+#include "BsSkybox.h"
 
 namespace bs {	namespace ct
 {
 	RendererScene::RendererScene(const SPtr<RenderBeastOptions>& options)
 		:mOptions(options)
 	{
-		mDefaultMaterial = bs_new<DefaultMaterial>();
 	}
 
 	RendererScene::~RendererScene()
@@ -29,8 +28,6 @@ namespace bs {	namespace ct
 			bs_delete(entry);
 
 		assert(mSamplerOverrides.empty());
-
-		bs_delete(mDefaultMaterial);
 	}
 
 	void RendererScene::registerCamera(Camera* camera)
@@ -38,7 +35,7 @@ namespace bs {	namespace ct
 		RENDERER_VIEW_DESC viewDesc = createViewDesc(camera);
 
 		RendererView* view = bs_new<RendererView>(viewDesc);
-		view->setPostProcessSettings(camera->getPostProcessSettings());
+		view->setRenderSettings(camera->getRenderSettings());
 		view->updatePerViewBuffer();
 
 		UINT32 viewIdx = (UINT32)mInfo.views.size();
@@ -60,13 +57,13 @@ namespace bs {	namespace ct
 			RENDERER_VIEW_DESC viewDesc = createViewDesc(camera);
 
 			view->setView(viewDesc);
-			view->setPostProcessSettings(camera->getPostProcessSettings());
+			view->setRenderSettings(camera->getRenderSettings());
 
 			updateCameraRenderTargets(camera);
 		}
-		else if((updateFlag & (UINT32)CameraDirtyFlag::PostProcess) != 0)
+		else if((updateFlag & (UINT32)CameraDirtyFlag::RenderSettings) != 0)
 		{
-			view->setPostProcessSettings(camera->getPostProcessSettings());
+			view->setRenderSettings(camera->getRenderSettings());
 		}
 		else // Transform
 		{
@@ -95,6 +92,8 @@ namespace bs {	namespace ct
 			// Swap current last element with the one we want to erase
 			std::swap(mInfo.views[cameraId], mInfo.views[lastCameraId]);
 			lastCamera->setRendererId(cameraId);
+
+			mInfo.cameraToView[lastCamera] = cameraId;
 		}
 		
 		// Last element is the one we want to erase
@@ -107,7 +106,7 @@ namespace bs {	namespace ct
 		if(iterFind != mInfo.cameraToView.end())
 			mInfo.cameraToView.erase(iterFind);
 
-		updateCameraRenderTargets(camera);
+		updateCameraRenderTargets(camera, true);
 	}
 
 	void RendererScene::registerLight(Light* light)
@@ -252,7 +251,7 @@ namespace bs {	namespace ct
 
 				// If no mInfo.aterial use the default mInfo.aterial
 				if (renElement.material == nullptr)
-					renElement.material = mDefaultMaterial->getMaterial();
+					renElement.material = DefaultMaterial::get()->getMaterial();
 
 				// Determine which technique to use
 				static StringID techniqueIDLookup[4] = { StringID::NONE, RTag_Skinned, RTag_Morph, RTag_SkinnedMorph };
@@ -397,24 +396,53 @@ namespace bs {	namespace ct
 		RendererReflectionProbe& probeInfo = mInfo.reflProbes.back();
 
 		mInfo.reflProbeWorldBounds.push_back(probe->getBounds());
+
+		// Find a spot in cubemap array
+		UINT32 numArrayEntries = (UINT32)mInfo.reflProbeCubemapArrayUsedSlots.size();
+		for(UINT32 i = 0; i < numArrayEntries; i++)
+		{
+			if(!mInfo.reflProbeCubemapArrayUsedSlots[i])
+			{
+				setReflectionProbeArrayIndex(probeId, i, false);
+				mInfo.reflProbeCubemapArrayUsedSlots[i] = true;
+				break;
+			}
+		}
+
+		// No empty slot was found
+		if (probeInfo.arrayIdx == -1)
+		{
+			setReflectionProbeArrayIndex(probeId, numArrayEntries, false);
+			mInfo.reflProbeCubemapArrayUsedSlots.push_back(true);
+		}
+
+		if(probeInfo.arrayIdx > MaxReflectionCubemaps)
+		{
+			LOGERR("Reached the maximum number of allowed reflection probe cubemaps at once. "
+				"Ignoring reflection probe data.");
+		}
 	}
 
-	void RendererScene::updateReflectionProbe(ReflectionProbe* probe)
+	void RendererScene::updateReflectionProbe(ReflectionProbe* probe, bool texture)
 	{
 		// Should only get called if transform changes, any other mInfo.ajor changes and ReflProbeInfo entry gets rebuild
 		UINT32 probeId = probe->getRendererId();
 		mInfo.reflProbeWorldBounds[probeId] = probe->getBounds();
 
-		RendererReflectionProbe& probeInfo = mInfo.reflProbes[probeId];
-		probeInfo.arrayDirty = true;
-
-		LightProbeCache::instance().notifyDirty(probe->getUUID());
-		probeInfo.textureDirty = true;
+		if (texture)
+		{
+			RendererReflectionProbe& probeInfo = mInfo.reflProbes[probeId];
+			probeInfo.arrayDirty = true;
+		}
 	}
 
 	void RendererScene::unregisterReflectionProbe(ReflectionProbe* probe)
 	{
 		UINT32 probeId = probe->getRendererId();
+		UINT32 arrayIdx = mInfo.reflProbes[probeId].arrayIdx;
+
+		if (arrayIdx != -1)
+			mInfo.reflProbeCubemapArrayUsedSlots[arrayIdx] = false;
 
 		ReflectionProbe* lastProbe = mInfo.reflProbes.back().probe;
 		UINT32 lastProbeId = lastProbe->getRendererId();
@@ -431,15 +459,6 @@ namespace bs {	namespace ct
 		// Last element is the one we want to erase
 		mInfo.radialLights.erase(mInfo.radialLights.end() - 1);
 		mInfo.radialLightWorldBounds.erase(mInfo.radialLightWorldBounds.end() - 1);
-
-		LightProbeCache::instance().unloadCachedTexture(probe->getUUID());
-	}
-
-	void RendererScene::setReflectionProbeTexture(UINT32 probeIdx, const SPtr<Texture>& texture)
-	{
-		RendererReflectionProbe* probe = &mInfo.reflProbes[probeIdx];
-		probe->texture = texture;
-		probe->textureDirty = false;
 	}
 
 	void RendererScene::setReflectionProbeArrayIndex(UINT32 probeIdx, UINT32 arrayIdx, bool markAsClean)
@@ -449,6 +468,17 @@ namespace bs {	namespace ct
 
 		if (markAsClean)
 			probe->arrayDirty = false;
+	}
+
+	void RendererScene::registerSkybox(Skybox* skybox)
+	{
+		mInfo.skybox = skybox;
+	}
+
+	void RendererScene::unregisterSkybox(Skybox* skybox)
+	{
+		if (mInfo.skybox == skybox)
+			mInfo.skybox = nullptr;
 	}
 
 	void RendererScene::setOptions(const SPtr<RenderBeastOptions>& options)
@@ -499,10 +529,6 @@ namespace bs {	namespace ct
 
 		viewDesc.target.numSamples = camera->getMSAACount();
 
-		viewDesc.isOverlay = camera->getFlags().isSet(CameraFlag::Overlay);
-		viewDesc.isHDR = camera->getFlags().isSet(CameraFlag::HDR);
-		viewDesc.noLighting = camera->getFlags().isSet(CameraFlag::NoLighting);
-		viewDesc.noShadows = camera->getFlags().isSet(CameraFlag::NoShadows);
 		viewDesc.triggerCallbacks = true;
 		viewDesc.runPostProcessing = true;
 		viewDesc.renderingReflections = false;
@@ -525,7 +551,7 @@ namespace bs {	namespace ct
 		return viewDesc;
 	}
 
-	void RendererScene::updateCameraRenderTargets(Camera* camera)
+	void RendererScene::updateCameraRenderTargets(Camera* camera, bool remove)
 	{
 		SPtr<RenderTarget> renderTarget = camera->getViewport()->getTarget();
 
@@ -538,14 +564,23 @@ namespace bs {	namespace ct
 			{
 				if (camera == *iterCam)
 				{
-					if (renderTarget != target.target)
+					if(remove)
 					{
 						target.cameras.erase(iterCam);
-						rtChanged = 2;
-
+						rtChanged = 1;
+						
 					}
 					else
-						rtChanged = 1;
+					{
+						if (renderTarget != target.target)
+						{
+							target.cameras.erase(iterCam);
+							rtChanged = 2;
+
+						}
+						else
+							rtChanged = 1;
+					}
 
 					break;
 				}
@@ -682,7 +717,8 @@ namespace bs {	namespace ct
 			return;
 		
 		// Note: Before uploading bone matrices perhaps check if they has actually been changed since last frame
-		mInfo.renderables[idx]->renderable->updateAnimationBuffers(frameInfo.animData);
+		if(frameInfo.animData != nullptr)
+			mInfo.renderables[idx]->renderable->updateAnimationBuffers(*frameInfo.animData);
 		
 		// Note: Could this step be moved in notifyRenderableUpdated, so it only triggers when material actually gets
 		// changed? Although it shouldn't matter much because if the internal versions keeping track of dirty params.

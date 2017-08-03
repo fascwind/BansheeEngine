@@ -5,7 +5,6 @@ set(BS_RENDERBEAST_INC_NOFILTER
 	"Include/BsRenderBeast.h"
 	"Include/BsRenderBeastFactory.h"
 	"Include/BsRenderBeastPrerequisites.h"
-	"Include/BsRenderTargets.h"
 	"Include/BsObjectRendering.h"
 	"Include/BsLightRendering.h"
 	"Include/BsPostProcessing.h"
@@ -16,6 +15,10 @@ set(BS_RENDERBEAST_INC_NOFILTER
 	"Include/BsShadowRendering.h"
 	"Include/BsRendererScene.h"
 	"Include/BsStandardDeferredLighting.h"
+	"Include/BsLightProbes.h"
+	"Include/BsRenderCompositor.h"
+	"Include/BsRendererTextures.h"
+	"Include/BsRenderBeastIBLUtility.h"
 )
 
 set(BS_RENDERBEAST_SRC_NOFILTER
@@ -24,7 +27,6 @@ set(BS_RENDERBEAST_SRC_NOFILTER
 	"Source/BsRenderBeast.cpp"
 	"Source/BsRenderBeastFactory.cpp"
 	"Source/BsRenderBeastPlugin.cpp"
-	"Source/BsRenderTargets.cpp"
 	"Source/BsObjectRendering.cpp"
 	"Source/BsLightRendering.cpp"
 	"Source/BsPostProcessing.cpp"
@@ -35,6 +37,10 @@ set(BS_RENDERBEAST_SRC_NOFILTER
 	"Source/BsShadowRendering.cpp"
 	"Source/BsRendererScene.cpp"
 	"Source/BsStandardDeferredLighting.cpp"
+	"Source/BsLightProbes.cpp"
+	"Source/BsRenderCompositor.cpp"
+	"Source/BsRendererTextures.cpp"
+	"Source/BsRenderBeastIBLUtility.cpp"
 )
 
 source_group("Header Files" FILES ${BS_RENDERBEAST_INC_NOFILTER})

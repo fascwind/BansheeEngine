@@ -1,4 +1,4 @@
-[![Join the chat at https://gitter.im/Banshee3D/Lobby](https://badges.gitter.im/Banshee3D/Lobby.svg)](https://gitter.im/Banshee3D/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Latest version](https://img.shields.io/badge/latest-v0.4--dev-red.svg)](https://img.shields.io/badge/latest-v0.4--dev-red.svg) [![Join the chat at https://gitter.im/Banshee3D/Lobby](https://badges.gitter.im/Banshee3D/Lobby.svg)](https://gitter.im/Banshee3D/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Что такое Banshee?
 

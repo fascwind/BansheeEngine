@@ -77,10 +77,6 @@
             "UUID": "eef92578-b8ed-45d6-8eed-d85697ade3c5"
         },
         {
-            "Path": "ResolveCommon.bslinc",
-            "UUID": "1cde4f3c-534e-4128-8ee1-63e3bb620734"
-        },
-        {
             "Path": "SkinnedVertexInput.bslinc",
             "UUID": "d6a2ea27-5f4c-41ad-88bc-cad7dd7adc8d"
         },
@@ -143,6 +139,22 @@
         {
             "Path": "PPGaussianDOFCommon.bslinc",
             "UUID": "78521453-a352-4fd8-b997-8e58942dee2d"
+        },
+        {
+            "Path": "RayMarch.bslinc",
+            "UUID": "c64f9bee-c0c2-442e-9f59-35da0494e827"
+        },
+        {
+            "Path": "ColorSpace.bslinc",
+            "UUID": "9fc44e5a-b23f-4002-bd2e-793cf0d03c32"
+        },
+        {
+            "Path": "TemporalResolve.bslinc",
+            "UUID": "b0ce01c2-3326-445e-bf2b-35cf8d9d6e1b"
+        },
+        {
+            "Path": "ImportanceSampling.bslinc",
+            "UUID": "52a46920-860e-4d05-a7c3-34e926b02664"
         }
     ],
     "Shaders": [
@@ -193,10 +205,6 @@
         {
             "Path": "PPTonemapping.bsl",
             "UUID": "a8aa01e7-7e72-4f84-89f8-a0097250b0d3"
-        },
-        {
-            "Path": "Resolve.bsl",
-            "UUID": "9d5f5101-2d7e-432c-b8ad-1998de9ca5c7"
         },
         {
             "Path": "Skybox.bsl",
@@ -305,6 +313,38 @@
         {
             "Path": "PPGaussianDOFCombine.bsl",
             "UUID": "2743e8f1-97cf-4441-b9e4-aad280343901"
+        },
+        {
+            "Path": "PPBuildHiZ.bsl",
+            "UUID": "1b314248-1965-49c5-968b-ae923c2af717"
+        },
+        {
+            "Path": "PPFXAA.bsl",
+            "UUID": "f064b202-dbc0-440f-bd9f-37f094b2c521"
+        },
+        {
+            "Path": "PPSSAO.bsl",
+            "UUID": "7a65b0f1-9a37-452e-ba3f-2a1fb58362cb"
+        },
+        {
+            "Path": "PPSSAODownsample.bsl",
+            "UUID": "c06a649a-646e-48cf-89fc-f97e46f75264"
+        },
+        {
+            "Path": "PPSSAOBlur.bsl",
+            "UUID": "46c7f742-a02d-4e1f-b121-047cd62a6d4d"
+        },
+        {
+            "Path": "PPSSRTrace.bsl",
+            "UUID": "daadcf73-1ae5-4f8f-90e5-a6e538832304"
+        },
+        {
+            "Path": "PPSSRStencil.bsl",
+            "UUID": "a9eb5ddf-1196-48d8-9403-a80a9595cde0"
+        },
+        {
+            "Path": "PPSSRResolve.bsl",
+            "UUID": "86b9699c-162d-4729-9985-c94e0f45bacb"
         }
     ],
     "Skin": [

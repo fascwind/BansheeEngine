@@ -9,10 +9,13 @@
 namespace bs 
 { 
 	class RendererExtension;
-	struct PostProcessSettings;
+	class LightProbeVolume;
+	struct RenderSettings;
 
 	namespace ct
 	{
+	class RendererTask;
+
 	/** @addtogroup Renderer-Internal
 	 *  @{
 	 */
@@ -44,6 +47,9 @@ namespace bs
 
 		/** Initializes the renderer. Must be called before using the renderer. */
 		virtual void initialize() { }
+
+		/** Called every frame. Triggers render task callbacks. */
+		void update();
 
 		/**	Cleans up the renderer. Must be called before the renderer is deleted. */
 		virtual void destroy() { }
@@ -132,7 +138,7 @@ namespace bs
 		 *
 		 * @note	Core thread.
 		 */
-		virtual void notifyReflectionProbeUpdated(ReflectionProbe* probe) { }
+		virtual void notifyReflectionProbeUpdated(ReflectionProbe* probe, bool texture) { }
 
 		/**
 		 * Called whenever a reflection probe is destroyed.
@@ -142,6 +148,27 @@ namespace bs
 		virtual void notifyReflectionProbeRemoved(ReflectionProbe* probe) { }
 
 		/**
+		 * Called whenever a new light probe volume is created.
+		 *
+		 * @note	Core thread.
+		 */
+		virtual void notifyLightProbeVolumeAdded(LightProbeVolume* volume) { }
+
+		/**
+		 * Called whenever a light probe volume is updated.
+		 *
+		 * @note	Core thread.
+		 */
+		virtual void notifyLightProbeVolumeUpdated(LightProbeVolume* volume, bool coefficientsUpdated) { }
+
+		/**
+		 * Called whenever a light probe volume is destroyed.
+		 *
+		 * @note	Core thread.
+		 */
+		virtual void notifyLightProbeVolumeRemoved(LightProbeVolume* volume) { }
+
+		/**
 		 * Called whenever a skybox is created.
 		 *
 		 * @note	Core thread.
@@ -149,18 +176,22 @@ namespace bs
 		virtual void notifySkyboxAdded(Skybox* skybox) { }
 
 		/**
-		 * Called whenever the texture assigned to a skybox is changed.
-		 *
-		 * @note	Core thread.
-		 */
-		virtual void notifySkyboxTextureChanged(Skybox* skybox) { }
-
-		/**
 		 * Called whenever a skybox is destroyed.
 		 *
 		 * @note	Core thread.
 		 */
 		virtual void notifySkyboxRemoved(Skybox* skybox) { }
+
+		/** 
+		 * Captures the scene at the specified location into a cubemap. 
+		 * 
+		 * @param[in]	cubemap		Cubemap to store the results in.
+		 * @param[in]	position	Position to capture the scene at.
+		 * @param[in]	hdr			If true scene will be captured in a format that supports high dynamic range.
+		 *
+		 * @note	Core thread.
+		 */
+		virtual void captureSceneCubeMap(const SPtr<Texture>& cubemap, const Vector3& position, bool hdr) = 0;
 
 		/**
 		 * Creates a new empty renderer mesh data.
@@ -196,16 +227,22 @@ namespace bs
 		 */
 		void removePlugin(RendererExtension* plugin) { mCallbacks.erase(plugin); }
 
+		/**
+		 * Registers a new task for execution on the core thread.
+		 * 
+		 * @note	Thread safe.
+		 */
+		void addTask(const SPtr<RendererTask>& task);
+
 		/**	Sets options used for controlling the rendering. */
 		virtual void setOptions(const SPtr<RendererOptions>& options) { }
 
 		/**	Returns current set of options used for controlling the rendering. */
 		virtual SPtr<RendererOptions> getOptions() const { return SPtr<RendererOptions>(); }
 
-		/** Creates post process settings that can be attached to a camera and processed by the active renderer. */
-		virtual SPtr<PostProcessSettings> createPostProcessSettings() const = 0;
-
 	protected:
+		friend class RendererTask;
+
 		/**	Contains information about a render callback. */
 		struct RenderCallbackData
 		{
@@ -213,14 +250,90 @@ namespace bs
 			std::function<void()> callback;
 		};
 
+		/**
+		 * Executes all renderer tasks queued for this frame.
+		 *
+		 * @param[in]	forceAll	If true, multi-frame tasks will be forced to execute fully within this call.
+		 * 
+		 * @note	Core thread.
+		 */
+		void processTasks(bool forceAll);
+
+		/**
+		 * Executes the provided renderer task.
+		 *
+		 * @param[in]	task		Task to execute.
+		 * @param[in]	forceAll	If true, multi-frame tasks will be forced to execute fully within this call.
+		 * 
+		 * @note	Core thread.
+		 */
+		void processTask(RendererTask& task, bool forceAll);
+
 		/** Callback to trigger when comparing the order in which renderer extensions are called. */
 		static bool compareCallback(const RendererExtension* a, const RendererExtension* b);
 
 		Set<RendererExtension*, std::function<bool(const RendererExtension*, const RendererExtension*)>> mCallbacks;
+
+		Vector<SPtr<RendererTask>> mQueuedTasks; // Sim & core thread
+		Vector<SPtr<RendererTask>> mUnresolvedTasks; // Sim thread
+		Vector<SPtr<RendererTask>> mRemainingUnresolvedTasks; // Sim thread
+		Vector<SPtr<RendererTask>> mRunningTasks; // Core thread
+		Vector<SPtr<RendererTask>> mRemainingTasks; // Core thread
+		Mutex mTaskMutex;
 	};
 
 	/**	Provides easy access to Renderer. */
 	SPtr<Renderer> BS_CORE_EXPORT gRenderer();
+
+	/**
+	 * Task that represents an asynchonous operation queued for execution on the core thread. All such tasks are executed
+	 * before main rendering happens, every frame.
+	 *
+	 * @note	Thread safe except where stated otherwise.
+	 */
+	class BS_CORE_EXPORT RendererTask
+	{
+		struct PrivatelyConstruct {};
+
+	public:
+		RendererTask(const PrivatelyConstruct& dummy, const String& name, std::function<bool()> taskWorker);
+
+		/**
+		 * Creates a new task. Task should be provided to Renderer in order for it to start.
+		 *
+		 * @param[in]	name		Name you can use to more easily identify the task.
+		 * @param[in]	taskWorker	Worker method that does all of the work in the task. Tasks can run over the course of
+		 *							multiple frames, in which case this method should return false (if there's more
+		 *							work to be done), or true (if the task has completed).
+		 */
+		static SPtr<RendererTask> create(const String& name, std::function<bool()> taskWorker);
+
+		/** Returns true if the task has completed. */
+		bool isComplete() const;
+
+		/**	Returns true if the task has been canceled. */
+		bool isCanceled() const;
+
+		/** Blocks the current thread until the task has completed. */
+		void wait();
+
+		/** Cancels the task and removes it from the Renderer's queue. */
+		void cancel();
+
+		/** 
+		 * Callback triggered on the sim thread, when the task completes. Is not triggered if the task is cancelled.
+		 *
+		 * @note	Sim thread only.
+		 */
+		Event<void()> onComplete;
+
+	private:
+		friend class Renderer;
+
+		String mName;
+		std::function<bool()> mTaskWorker;
+		std::atomic<UINT32> mState; /**< 0 - Inactive, 1 - In progress, 2 - Completed, 3 - Canceled */
+	};
 
 	/** @} */
 }}

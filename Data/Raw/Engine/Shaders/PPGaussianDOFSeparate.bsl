@@ -13,7 +13,7 @@ technique PPGaussianDOFSeparate
 		
 		SamplerState gDepthSamp;
 		Texture2D gDepthTex;
-
+		
 		void addSample(float2 uv, float2 offset, float depth, inout float4 nearColor, inout float4 farColor)
 		{
 			float4 smp;
@@ -36,7 +36,7 @@ technique PPGaussianDOFSeparate
 			#endif
 			)
 		{
-			float4 depth = convertFromDeviceZ(gDepthTex.Gather(gDepthSamp, input.uv0));
+			float4 depth = -convertFromDeviceZ(gDepthTex.Gather(gDepthSamp, input.uv0));
 			
 			float4 nearColor = 0;
 			float4 farColor = 0;
@@ -45,8 +45,8 @@ technique PPGaussianDOFSeparate
 			// depth Gather
 			addSample(input.uv0, float2(-1, 1), depth.x, nearColor, farColor);
 			addSample(input.uv0, float2(1, 1), depth.y, nearColor, farColor);
-			addSample(input.uv0, float2(1, -1), depth.x, nearColor, farColor);
-			addSample(input.uv0, float2(-1, -1), depth.x, nearColor, farColor);
+			addSample(input.uv0, float2(1, -1), depth.z, nearColor, farColor);
+			addSample(input.uv0, float2(-1, -1), depth.w, nearColor, farColor);
 			
 			nearColor *= 0.25f;
 			farColor *= 0.25f;

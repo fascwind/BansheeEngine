@@ -9,6 +9,7 @@
 namespace bs
 {
 	const AABox AABox::BOX_EMPTY;
+	const AABox AABox::UNIT_BOX = AABox(Vector3(-0.5f, -0.5f, -0.5f), Vector3(0.5f, 0.5f, 0.5f));
 
 	const UINT32 AABox::CUBE_INDICES[36] =
 	{
@@ -458,7 +459,7 @@ namespace bs
 
 	float AABox::getRadius() const
 	{
-		return (mMaximum - mMinimum).length();
+		return ((mMaximum - mMinimum) * 0.5).length();
 	}
 
 	float AABox::getVolume() const

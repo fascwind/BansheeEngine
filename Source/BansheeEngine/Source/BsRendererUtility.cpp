@@ -122,18 +122,10 @@ namespace bs { namespace ct
 
 			mSkyBoxMesh = Mesh::create(meshData);
 		}
-
-		// TODO - When I add proper preprocessor support, merge these into a single material
-		mResolveMat = bs_shared_ptr_new<ResolveMat>();
-		mBlitMat = bs_shared_ptr_new<BlitMat>();
-
-		IBLUtility::startUp();
 	}
 
 	RendererUtility::~RendererUtility()
-	{
-		IBLUtility::shutDown();
-	}
+	{ }
 
 	void RendererUtility::setPass(const SPtr<Material>& material, UINT32 passIdx, UINT32 techniqueIdx)
 	{
@@ -254,26 +246,15 @@ namespace bs { namespace ct
 		mesh->_notifyUsedOnGPU();
 	}
 
-	void RendererUtility::blit(const SPtr<Texture>& texture, const Rect2I& area, bool flipUV)
+	void RendererUtility::blit(const SPtr<Texture>& texture, const Rect2I& area, bool flipUV, bool isDepth)
 	{
 		auto& texProps = texture->getProperties();
-		SPtr<Material> mat;
-		SPtr<GpuParamsSet> params;
-		if (texProps.getNumSamples() > 1)
-		{
-			mat = mResolveMat->getMaterial();
-			params = mResolveMat->getParamsSet();
-			mResolveMat->setParameters(texture);
-		}
-		else
-		{
-			mat = mBlitMat->getMaterial();
-			params = mBlitMat->getParamsSet();
-			mBlitMat->setParameters(texture);
-		}
 
-		setPass(mat);
-		setPassParams(params);
+		BlitMat* blitMat = BlitMat::getVariation(texProps.getNumSamples(), !isDepth);
+		blitMat->setParameters(texture);
+
+		setPass(blitMat->getMaterial());
+		setPassParams(blitMat->getParamsSet());
 
 		Rect2 fArea((float)area.x, (float)area.y, (float)area.width, (float)area.height);
 		if (area.width == 0 || area.height == 0)
@@ -359,14 +340,62 @@ namespace bs { namespace ct
 		return RendererUtility::instance();
 	}
 
+	ShaderVariation BlitMat::VAR_1MSAA_Color = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 1),
+		ShaderVariation::Param("COLOR", true)
+	});
+	ShaderVariation BlitMat::VAR_2MSAA_Color = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 2),
+		ShaderVariation::Param("COLOR", true)
+	});
+
+	ShaderVariation BlitMat::VAR_4MSAA_Color = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 4),
+		ShaderVariation::Param("COLOR", true)
+	});
+
+	ShaderVariation BlitMat::VAR_8MSAA_Color = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 8),
+		ShaderVariation::Param("COLOR", true)
+	});
+
+	ShaderVariation BlitMat::VAR_1MSAA_Depth = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 1),
+		ShaderVariation::Param("COLOR", false)
+	});
+
+	ShaderVariation BlitMat::VAR_2MSAA_Depth = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 2),
+		ShaderVariation::Param("COLOR", false)
+	});
+
+	ShaderVariation BlitMat::VAR_4MSAA_Depth = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 4),
+		ShaderVariation::Param("COLOR", false)
+	});
+
+	ShaderVariation BlitMat::VAR_8MSAA_Depth = ShaderVariation({
+		ShaderVariation::Param("MSAA_COUNT", 8),
+		ShaderVariation::Param("COLOR", false)
+	});
+
+
 	BlitMat::BlitMat()
 	{
 		mSource = mMaterial->getParamTexture("gSource");
 	}
 
-	void BlitMat::_initDefines(ShaderDefines& defines)
+	void BlitMat::_initVariations(ShaderVariations& variations)
 	{
-		// Do nothing
+		variations.add(VAR_1MSAA_Color);
+		variations.add(VAR_2MSAA_Color);
+		variations.add(VAR_4MSAA_Color);
+		variations.add(VAR_8MSAA_Color);
+
+		variations.add(VAR_1MSAA_Depth);
+		variations.add(VAR_2MSAA_Depth);
+		variations.add(VAR_4MSAA_Depth);
+		variations.add(VAR_8MSAA_Depth);
 	}
 
 	void BlitMat::setParameters(const SPtr<Texture>& source)
@@ -375,24 +404,38 @@ namespace bs { namespace ct
 		mMaterial->updateParamsSet(mParamsSet);
 	}
 
-	ResolveMat::ResolveMat()
+	BlitMat* BlitMat::getVariation(UINT32 msaaCount, bool isColor)
 	{
-		mSource = mMaterial->getParamTexture("gSource");
-		mMaterial->getParam("gNumSamples", mNumSamples);
-	}
-
-	void ResolveMat::_initDefines(ShaderDefines& defines)
-	{
-		// Do nothing
-	}
-
-	void ResolveMat::setParameters(const SPtr<Texture>& source)
-	{
-		mSource.set(source);
-
-		UINT32 sampleCount = source->getProperties().getNumSamples();
-		mNumSamples.set(sampleCount);
-
-		mMaterial->updateParamsSet(mParamsSet);
+		if (msaaCount > 1)
+		{
+			if(isColor)
+			{
+				switch(msaaCount)
+				{
+				case 2:
+					return get(VAR_2MSAA_Color);
+				case 4:
+					return get(VAR_4MSAA_Color);
+				default:
+				case 8:
+					return get(VAR_8MSAA_Color);
+				}
+			}
+			else
+			{
+				switch(msaaCount)
+				{
+				case 2:
+					return get(VAR_2MSAA_Depth);
+				case 4:
+					return get(VAR_4MSAA_Depth);
+				default:
+				case 8:
+					return get(VAR_8MSAA_Depth);
+				}
+			}
+		}
+		else
+			return get(VAR_1MSAA_Color);
 	}
 }}

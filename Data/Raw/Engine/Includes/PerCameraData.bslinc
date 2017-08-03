@@ -17,6 +17,10 @@ mixin PerCameraData
 			// and view_z/view_w in view space, into world space				
 			float4x4 gMatScreenToWorld;
 			
+			// Transforms a location in NDC, to the location of the same pixel on the previous frame. Used for
+			// determining camera movement for temporal filtering
+			float4x4 gNDCToPrevNDC;			
+			
 			// Converts device Z to world Z using this formula: worldZ = (1 / (deviceZ + y)) * x
 			float2 	 gDeviceZToWorldZ;
 			float2	 gNDCZToWorldZ;
@@ -52,7 +56,7 @@ mixin PerCameraData
 		{
 			return -gNDCZToWorldZ.y + (gNDCZToWorldZ.x / viewZ);
 		}
-		
+				
 		/** Converts Z value from NDC space to device Z value in range [0, 1]. */
 		float NDCZToDeviceZ(float ndcZ)
 		{
@@ -69,6 +73,12 @@ mixin PerCameraData
 		float2 NDCToUV(float2 ndcPos)
 		{
 			return ndcPos.xy * gClipToUVScaleOffset.xy + gClipToUVScaleOffset.zw;
+		}
+		
+		/** Converts position in UV coordinates mapped to screen rectangle to NDC coordinates. */
+		float2 UVToNDC(float2 uvPos)
+		{
+			return (uvPos - gClipToUVScaleOffset.zw) / gClipToUVScaleOffset.xy;
 		}
 		
 		/** Converts position in UV coordinates mapped to the screen, to screen coordinates in pixels. */
