@@ -1,0 +1,117 @@
+Manuals									{#manuals}
+===============
+
+# Quick start
+[Getting started](gettingStarted.md) - This is a short guide on how to create a fully functional Banshee application, aimed to get you up and running quickly, without going into too much detail.
+
+# User manuals
+A complete set of manuals covering all major functionality provided by Banshee, starting with basics and slowly guiding you through more advanced concepts. This should be the primary entry point for new users.
+- [Startup and main loop](./User/startingUp.md)
+- [Scene objects and components](./User/scenesAndComponents.md)
+- **Resources**
+ - [Basics and import](./User/resourceBasicsAndImport.md)
+ - [Saving and loading](./User/resourceSavingAndLoading.md)
+- **Utilities**
+ - [Containers](./User/containers.md)
+ - [Strings](./User/strings.md)
+ - [Memory allocation](./User/memory.md)
+ - [Smart pointers](./User/smartPointers.md) 
+ - [Events](./User/events.md)
+ - [File system](./User/fileSystem.md) 
+ - [Math utilities](./User/math.md)
+ - [Logging messages](./User/logging.md)
+ - [Measuring time](./User/time.md)
+- **Graphics**
+ - [Windows](./User/windows.md)
+ - [Cameras](./User/cameras.md)
+ - [Importing textures](./User/importingTextures.md)
+ - [Importing meshes](./User/importingMeshes.md)
+ - [Materials](./User/simpleMaterial.md)
+ - [Rendering objects](./User/renderingObjects.md)
+ - [Lighting](./User/lights.md)
+ - [Image based lighting](./User/imageBasedLighting.md)
+- **Input**
+ - [Input polling](./User/inputPolling.md) 
+ - [Input events](./User/inputEvents.md) 
+ - [Virtual input](./User/virtualInput.md)
+- [Creating custom components](./User/customComponents.md)
+- [Serializing objects](./User/serializingObjects.md)
+- **GUI**
+ - [Sprite textures](./User/spriteTextures.md)
+ - [Basic setup](./User/guiSetup.md)
+ - [Elements](./User/guiElements.md)
+ - [Layouts](./User/guiLayouts.md)
+ - [Styles](./User/guiStyles.md)
+ - [Importing fonts](./User/importingFonts.md)
+ - [Localization](./User/guiLocalization.md)
+- **Audio**
+ - [Importing audio files](./User/importingAudio.md)
+ - [Playing audio](./User/playingAudio.md)
+- **Physics**
+ - [Colliders](./User/colliders.md)
+ - [Physics mesh import](./User/physicsMesh.md)
+ - [Triggers](./User/triggers.md)
+ - [Dynamic objects](./User/rigidbodies.md)
+ - [Physics material](./User/physicalMaterial.md)
+ - [Character controller](./User/characterController.md)
+ - [Scene queries](./User/sceneQueries.md)
+ - [Joints](./User/joints.md)
+- **Animation**
+ - [Loading animation clips](./User/animationClip.md)
+ - [Playing animation](./User/animation.md)
+ - [Bones](./User/bones.md)
+ - [Advanced animation](./User/advancedAnimation.md)
+- **Advanced**
+ - [Shaders](./User/shaders.md)
+ - [Manipulating textures](./User/advancedTextures.md)
+ - [Offscreen rendering](./User/offscreenRendering.md)
+ - [Creating meshes](./User/creatingMeshes.md)
+ - [Advanced startup](./User/advancedStartup.md)
+ - [Advanced RTTI](./User/advancedRtti.md)
+ - [Advanced resources](./User/advResources.md)
+ - [Prefabs](./User/prefabs.md)
+ - [Cursors](./User/cursors.md)
+ - [Profiling](./User/profiling.md)
+ 
+# Developer manuals
+A set of manuals covering advanced functionality intented for those wanting to extend the engine or tinker with the internals, rather than for normal users. You are expected to have read the user manuals first.
+- [Architecture overview](architecture.md) 
+- **Low level rendering API**
+ - [Core thread](coreThread.md)
+ - [GPU programs](gpuPrograms.md)
+ - [Non-programmable states](nonProgrammableStates.md)
+ - [Geometry](geometry.md)
+ - [Render targets](renderTargets.md)
+ - [Drawing](drawing.md) 
+ - [Load-store textures](loadStoreTextures.md)
+ - [GPU buffers](gpuBuffers.md)
+ - [Compute](compute.md)
+ - [Command buffers](commandBuffers.md)
+ - [GPU profiling](gpuProfiling.md)
+ - [Working example](lowLevelRenderingExample.md)
+- **More utilities**
+ - [Modules](modules.md)
+ - [Advanced memory allocation](advMemAlloc.md)
+ - [Crash handling](crashHandling.md)
+ - [Dynamic libraries](dynLib.md)
+ - [Flags](flags.md)
+ - [Any](any.md) 
+ - [Unit tests](unitTests.md)
+- [Advanced materials](advMaterials.md)
+- [Threading](threading.md)
+- [Plugins](plugins.md)
+- **Renderer**
+ - [Renderer extensions](rendererExtensions.md)
+ - [Creating a renderer plugin](customRenderer.md)
+- **Resources**
+ - [Creating new resource types](customResources.md)
+ - [Creating custom importers](customImporters.md)
+- **Scripting**
+ - [Exposing code to script API (automated)](scriptingAuto.md)
+ - **Exposing code to script API (manually)**
+  - [Interacting with the script runtime](mono.md)
+  - [Script objects](scriptObjects.md)
+- [Extending the GUI system](customGui.md)
+- [Porting to other platforms](porting.md)
+- [Code style](codeStyle.md)
+- [Quick reference](quickref.md)
